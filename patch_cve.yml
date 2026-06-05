@@ -25,23 +25,23 @@
 
     - set_fact:
         hosts: "{{ cve_data.json.hosts | flatten }}"
+        packages: "{{ cve_data.json.rpms | flatten }}"
 
     - debug:
         var: hosts
 
 
-# - name: Update vulnerable packages
-#   hosts: "{{ hosts }}"
-#   become: true
-#   tasks:
-#     - name: Install Updates
-#       ansible.builtin.dnf:
-#         name: '*'
-#         state: latest
-#       loop: packages
-#       register: updates
+- name: Update vulnerable packages
+  hosts: "{{ hosts }}"
+  become: true
+  tasks:
+    - name: Install Updates
+      ansible.builtin.dnf:
+        name: "{{ packages }}"
+        state: latest
+      register: updates
 
-#     - name: Gather Package Facts
-#       ansible.builtin.package_facts:
-#         manager: auto
-#       when: ansible_os_family != 'Windows'
+    - name: Gather Package Facts
+      ansible.builtin.package_facts:
+        manager: auto
+      when: ansible_os_family != 'Windows'
