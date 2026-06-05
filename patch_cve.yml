@@ -24,12 +24,11 @@
       register: cve_data
 
     - set_fact:
-        hosts: "{{ cve_data.json.hosts | flatten }}"
+        hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
         packages: "{{ cve_data.json.rpms | flatten }}"
 
     - debug:
         var: hosts
-
 
 - name: Update vulnerable packages
   hosts: "{{ hostvars['localhost'].hosts }}"
