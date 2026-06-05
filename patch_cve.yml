@@ -20,7 +20,7 @@
         user: "{{ username }}"
         password: "{{ password }}"
         force_basic_auth: true
-        status: 200, 404
+        status_code: [200, 404]
       register: cve_data
 
     - ansible.builtin.meta: end_play
