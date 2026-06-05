@@ -23,6 +23,9 @@
         status_code: [200, 404]
       register: cve_data
 
+    - debug:
+        var: cve_data
+
     - ansible.builtin.meta: end_play
       when: | 
         cve_data.status == 404 or
