@@ -23,22 +23,21 @@
         force_basic_auth: true
       register: cve_data
 
-    - set_stats:
-        data:
-          hosts: "{{ cve_data.json.hosts | flatten }}"
-          packages: "{{ cve_data.json.rpms | flatten }}"
+    - set_fact:
+        hosts: "{{ cve_data.json.hosts | flatten }}"
+        packages: "{{ cve_data.json.rpms | flatten }}"
 
     - debug:
         var: hosts
 
 
 - name: Update vulnerable packages
-  hosts: "{{ hosts }}"
+  hosts: "{{ hostvars['localhost'].hosts }}"
   become: true
   tasks:
     - name: Install Updates
       ansible.builtin.dnf:
-        name: "{{ packages }}"
+        name: "{{ hostvars['localhost'].packages }}"
         state: latest
       register: updates
 
