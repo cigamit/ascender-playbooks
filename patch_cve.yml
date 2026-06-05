@@ -24,8 +24,9 @@
       register: cve_data
 
     - set_stats:
-        hosts: "{{ cve_data.json.hosts | flatten }}"
-        packages: "{{ cve_data.json.rpms | flatten }}"
+        data:
+          hosts: "{{ cve_data.json.hosts | flatten }}"
+          packages: "{{ cve_data.json.rpms | flatten }}"
 
     - debug:
         var: hosts
