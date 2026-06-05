@@ -23,7 +23,11 @@
         force_basic_auth: true
       register: cve_data
 
-  
+    - set_fact:
+        hosts: "{{ cve_data.json.hosts | flatten }}"
+
+    - debug:
+        var: hosts
 
 
 # - name: Update vulnerable packages
