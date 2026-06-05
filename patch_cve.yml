@@ -5,6 +5,7 @@
   vars:
     cve: ""
     ledger_url: ""
+    hosts: []
   tasks:
     - name: Assert that CVE / Ledger URL is not blank
       ansible.builtin.assert:
@@ -19,14 +20,16 @@
         user: "{{ username }}"
         password: "{{ password }}"
         force_basic_auth: true
+        status: 200, 404
       register: cve_data
+
+    - ansible.builtin.meta: end_play
+      when:
+        - cve_data.status == 404 or cve_data.json.hosts is undefined or cve_data.json.hosts is empty
 
     - set_fact:
         hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
         packages: "{{ cve_data.json.rpms | flatten }}"
-
-    - debug:
-        var: hosts
 
 - name: Update vulnerable packages
   hosts: "{{ hostvars['localhost'].hosts }}"
