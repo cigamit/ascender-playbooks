@@ -34,13 +34,18 @@
   hosts: "{{ hostvars['localhost'].hosts }}"
   become: true
   tasks:
+    - name: Gather Package Facts before patching
+      ansible.builtin.package_facts:
+        manager: auto
+      when: ansible_os_family != 'Windows'
+
     - name: Install Updates
       ansible.builtin.dnf:
-        name: "{{ hostvars['localhost'].packages }}"
+        name: "{{ hostvars['localhost'].packages | select('in', ansible_facts.packages.keys() | list) | list }}"
         state: latest
       register: updates
 
-    - name: Gather Package Facts
+    - name: Gather Package Facts after patching
       ansible.builtin.package_facts:
         manager: auto
       when: ansible_os_family != 'Windows'
