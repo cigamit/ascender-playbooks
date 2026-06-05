@@ -5,9 +5,7 @@
   vars:
     cve: ""
     ledger_url: ""
-
   tasks:
-
     - name: Assert that CVE / Ledger URL is not blank
       ansible.builtin.assert:
         that:
