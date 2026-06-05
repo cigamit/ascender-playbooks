@@ -1,0 +1,43 @@
+- name: Retrieve hosts from Ledger Pro
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    cve: ""
+    ledger_url: ""
+
+  tasks:
+
+    - name: Assert that CVE / Ledger URL is not blank
+      ansible.builtin.assert:
+        that:
+          - cve != ''
+          - ledger_url != ''
+
+    - name: Connect to Ascender Pro to retreive 
+      ansible.builtin.uri:
+        url: "{{ leger_url }}/api/v1/errata/cve/{{ cve }}/"
+        method: GET
+        user: "{{ username }}"
+        password: "{{ password }}"
+        force_basic_auth: true
+      register: cve_data
+
+  
+
+
+# - name: Update vulnerable packages
+#   hosts: "{{ hosts }}"
+#   become: true
+#   tasks:
+#     - name: Install Updates
+#       ansible.builtin.dnf:
+#         name: '*'
+#         state: latest
+#       loop: packages
+#       register: updates
+
+#     - name: Gather Package Facts
+#       ansible.builtin.package_facts:
+#         manager: auto
+#       when: ansible_os_family != 'Windows'
