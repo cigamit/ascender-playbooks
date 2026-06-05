@@ -16,7 +16,7 @@
 
     - name: Connect to Ascender Pro to retreive 
       ansible.builtin.uri:
-        url: "{{ leger_url }}/api/v1/errata/cve/{{ cve }}/"
+        url: "{{ ledger_url }}/api/v1/errata/cve/{{ cve }}/"
         method: GET
         user: "{{ username }}"
         password: "{{ password }}"
