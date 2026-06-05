@@ -23,7 +23,7 @@
         force_basic_auth: true
       register: cve_data
 
-    - set_fact:
+    - set_stat:
         hosts: "{{ cve_data.json.hosts | flatten }}"
         packages: "{{ cve_data.json.rpms | flatten }}"
 
