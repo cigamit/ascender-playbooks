@@ -5,7 +5,6 @@
   vars:
     cve: ""
     ledger_url: ""
-    hosts: none
   tasks:
     - name: Assert that CVE / Ledger URL is not blank
       ansible.builtin.assert:
@@ -23,8 +22,8 @@
         status_code: [200, 404]
       register: cve_data
 
-    - debug:
-        var: cve_data
+    - set_fact:
+        hosts: none
 
     - ansible.builtin.meta: end_play
       when: | 
