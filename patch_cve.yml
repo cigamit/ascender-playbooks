@@ -5,7 +5,6 @@
   vars:
     cve: ""
     ledger_url: ""
-    hosts: []
   tasks:
     - name: Validate CVE format
       ansible.builtin.assert:
@@ -32,6 +31,9 @@
         force_basic_auth: true
         status_code: [200, 404]
       register: cve_data
+
+    - set_fact:
+        hosts: []
 
     - ansible.builtin.meta: end_play
       when: | 
