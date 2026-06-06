@@ -48,7 +48,7 @@
     - name: Set a fact for our hosts and packages
       set_fact:
         hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
-        packages: "{{ cve_data.json.rpms | flatten }}"
+        packages: "{{ cve_data.json.rpms }}"
 
 - name: Update vulnerable packages
   hosts: "{{ hostvars['localhost'].hosts }}"
