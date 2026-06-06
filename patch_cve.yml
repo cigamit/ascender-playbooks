@@ -32,17 +32,17 @@
         status_code: [200, 404]
       register: cve_data
 
-    - set_fact:
-        hosts: none
+    # - set_fact:
+    #     hosts: none
 
-    # - ansible.builtin.meta: end_play
-    #   when: | 
-    #     cve_data.status == 404 or
-    #     cve_data.json is undefined or
-    #     cve_data.json.hosts is undefined or
-    #     cve_data.json.hosts | length > 0 or
-    #     cve_data.json.rpms is undefined or
-    #     cve_data.json.rpms | length > 0
+    - ansible.builtin.meta: end_play
+      when: | 
+        cve_data.status == 404 or
+        cve_data.json is undefined or
+        cve_data.json.hosts is undefined or
+        cve_data.json.hosts | length == 0 or
+        cve_data.json.rpms is undefined or
+        cve_data.json.rpms | length == 0
 
     - set_fact:
         hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
