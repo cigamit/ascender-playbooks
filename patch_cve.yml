@@ -6,15 +6,27 @@
     cve: ""
     ledger_url: ""
   tasks:
-    - name: Assert that CVE / Ledger URL is not blank
+    - name: Validate CVE format
       ansible.builtin.assert:
         that:
           - cve != ''
+          - (cve_name | upper) is match('^CVE-[0-9]{4}-[0-9]{4,7}$')
           - ledger_url != ''
+      fail_msg: Invalid CVE format. Expected CVE-YYYY-NNNN through CVE-YYYY-NNNNNNN.
+
+    - name: Validate Ledger base URL
+      ansible.builtin.assert:
+        that:
+          - ledger_url != ''
+          - ledger_url is match('^https?://(([A-Za-z0-9-]+\.)+[A-Za-z]{2,}|([0-9]{1,3}\.){3}[0-9]{1,3})(:[0-9]{1,5})?$')
+      fail_msg: >
+        API base URL must be http:// or https:// followed by a domain,
+        subdomain, or IPv4 address, optionally with a port, and must not
+        end with a slash.
 
     - name: Connect to Ascender Pro to retreive 
       ansible.builtin.uri:
-        url: "{{ ledger_url }}/api/v1/errata/cve/{{ cve }}/"
+        url: "{{ ledger_url }}/api/v1/errata/cve/{{ cve | upper }}/"
         method: GET
         user: "{{ username }}"
         password: "{{ password }}"
