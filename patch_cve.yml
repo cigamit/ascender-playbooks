@@ -10,7 +10,7 @@
       ansible.builtin.assert:
         that:
           - cve != ''
-          - (cve_name | upper) is match('^CVE-[0-9]{4}-[0-9]{4,7}$')
+          - (cve | upper) is match('^CVE-[0-9]{4}-[0-9]{4,7}$')
           - ledger_url != ''
         fail_msg: >
           Invalid CVE format. Expected CVE-YYYY-NNNN through CVE-YYYY-NNNNNNN.
