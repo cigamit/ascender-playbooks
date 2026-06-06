@@ -32,7 +32,8 @@
         status_code: [200, 404]
       register: cve_data
 
-    - set_fact:
+    - name: Set a blank host list in case of invalid CVE data
+      set_fact:
         hosts: []
 
     - ansible.builtin.meta: end_play
@@ -44,7 +45,8 @@
         cve_data.json.rpms is undefined or
         cve_data.json.rpms | length == 0
 
-    - set_fact:
+    - name: Set a fact for our hosts and packages
+      set_fact:
         hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
         packages: "{{ cve_data.json.rpms | flatten }}"
 
