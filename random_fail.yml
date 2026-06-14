@@ -1,0 +1,20 @@
+---
+- name: Randomly fail 1/3 of the time
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Generate random number between 0 and 2
+      set_fact:
+        random_value: "{{ range(0, 3) | random }}"
+
+    - name: Show generated value
+      debug:
+        msg: "Generated value: {{ random_value }}"
+
+    - name: Fail when random value is 0
+      assert:
+        that:
+          - random_value != 0
+        fail_msg: "Random failure triggered (1/3 chance)."
+        success_msg: "Passed random check."
