@@ -1,6 +1,6 @@
 - name: Retrieve hosts from Ledger Pro
   hosts: localhost
-  #gather_facts: false
+  gather_facts: false
   connection: local
   vars:
     cve: ""
