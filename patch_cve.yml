@@ -1,7 +1,8 @@
 - name: Retrieve hosts from Ledger Pro
-  hosts: localhost
+  hosts: all
   connection: local
   gather_facts: false
+  run_once: true
 
   vars:
     cve: ""
@@ -67,7 +68,6 @@
       ansible.builtin.dnf:
         name: "{{ cve_packages | select('in', ansible_facts.packages.keys() | list) | list }}"
         state: latest
-      register: updates
 
     - name: Gather Package Facts after patching
       ansible.builtin.package_facts:
