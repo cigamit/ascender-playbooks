@@ -1,10 +1,12 @@
 - name: Retrieve hosts from Ledger Pro
   hosts: localhost
-  gather_facts: false
   connection: local
+  gather_facts: false
+
   vars:
     cve: ""
     ledger_url: ""
+
   tasks:
     - name: Validate CVE format
       ansible.builtin.assert:
@@ -22,7 +24,7 @@
           subdomain, or IPv4 address, optionally with a port, and must not
           end with a slash.
 
-    - name: Connect to Ascender Pro to retreive 
+    - name: Connect to Ledger Pro to retrieve CVE data
       ansible.builtin.uri:
         url: "{{ ledger_url }}/api/v1/errata/cve/{{ cve | upper }}/"
         method: GET
@@ -32,27 +34,29 @@
         status_code: [200, 404]
       register: cve_data
 
-    - name: Set a blank host list in case of invalid CVE data
-      set_fact:
-        hosts: []
+    - name: Stop if CVE data is invalid or empty
+      ansible.builtin.meta: end_play
+      when:
+        - cve_data.status == 404 or
+          cve_data.json is undefined or
+          cve_data.json.hosts is undefined or
+          cve_data.json.hosts | length == 0 or
+          cve_data.json.rpms is undefined or
+          cve_data.json.rpms | length == 0
 
-    - ansible.builtin.meta: end_play
-      when: | 
-        cve_data.status == 404 or
-        cve_data.json is undefined or
-        cve_data.json.hosts is undefined or
-        cve_data.json.hosts | length == 0 or
-        cve_data.json.rpms is undefined or
-        cve_data.json.rpms | length == 0
+    - name: Add Ledger hosts to patch group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: cve_patch_hosts
+        cve_packages: "{{ cve_data.json.rpms }}"
+      loop: "{{ cve_data.json.hosts }}"
+      when: item in hostvars
 
-    - name: Set a fact for our hosts and packages
-      set_fact:
-        hosts: "{{ cve_data.json.hosts | select('in', hostvars.keys() | list) | list }}"
-        packages: "{{ cve_data.json.rpms }}"
 
 - name: Update vulnerable packages
-  hosts: "{{ hostvars['localhost'].hosts }}"
+  hosts: cve_patch_hosts
   become: true
+
   tasks:
     - name: Gather Package Facts before patching
       ansible.builtin.package_facts:
@@ -61,7 +65,7 @@
 
     - name: Install Updates
       ansible.builtin.dnf:
-        name: "{{ hostvars['localhost'].packages | select('in', ansible_facts.packages.keys() | list) | list }}"
+        name: "{{ cve_packages | select('in', ansible_facts.packages.keys() | list) | list }}"
         state: latest
       register: updates
 
